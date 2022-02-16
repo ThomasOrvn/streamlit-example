@@ -122,7 +122,7 @@ while(auto_update_checkbox):
     table.empty()
     status.text("fetching data...")
     data = comboGets(search_input)
-    data = data.to_html(escape=False)
+    data = data.to_html(escape=False, index=False)
     table.write(data, unsafe_allow_html=True)
     now = now = moment.utcnow().timezone("Europe/Brussels").format('DD MMMM HH:mm:ss')
     status.text(f"Last refresh: {now}")
