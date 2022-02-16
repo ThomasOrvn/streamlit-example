@@ -103,7 +103,7 @@ data = comboGets("natural gas europe & Montel TTF prices").to_html(escape=False,
 
 #app layout
 st.title('SEGE LIVE Energy News App')
-search_input = st.text_input("Search: ",value="natural gas europe & Montel TTF prices", max_chars=50, placeholder="Insert 1 or multiple searches separated by &")
+search_input = st.text_input("Search: ",value="natural gas europe & Montel TTF prices", max_chars=200, placeholder="Insert 1 or multiple searches separated by &")
 st.markdown=(f"input is: {search_input}")
 
 status = st.empty()
