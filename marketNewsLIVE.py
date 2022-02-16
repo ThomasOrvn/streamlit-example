@@ -72,7 +72,6 @@ def getNews(keyword_input):
     df['title'] = df['title'] + '::' + df['link']
     df['title'] = df['title'].apply(make_clickable)
   #return news df as function output
-  df.head(10)
   return df
 
 #functions to combine newd flow from one or multiple searches
