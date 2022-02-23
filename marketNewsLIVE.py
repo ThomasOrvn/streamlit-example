@@ -109,7 +109,7 @@ if 'status' not in session:
 if 'auto_refresh_count' not in session:
     session.auto_refresh_count = 0
 if 'search' not in session:
-    session.search = "Natural Gas Europe"
+    session.search = "Natural Gas Europe & TTF Natural Gas prices & Europe Electricity Prices"
 if 'news_data' not in session:
     session.news_data = comboGets(session.search).to_html(escape=False, index=False)
 
