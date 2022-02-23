@@ -1,4 +1,6 @@
 #classics
+from multiprocessing.sharedctypes import Value
+from re import L
 import pandas as pd
 import moment
 import time
@@ -8,7 +10,6 @@ from bs4 import BeautifulSoup
 #streamlit
 import streamlit as st
 
-
 #make clickable links in data df
 def make_clickable(link):
     # target _blank to open new window
@@ -16,8 +17,7 @@ def make_clickable(link):
     print(title_link)
     return f'<a target="_blank" href="{title_link[1]}">{title_link[0]}</a>'
 
-#function to get news from one search
-@st.cache(suppress_st_warning=True)
+
 def getNews(keyword_input):
   #dynamic keyword to fetch any G news with dyn url
   keyword = keyword_input.split(" ")
@@ -75,7 +75,6 @@ def getNews(keyword_input):
   return df
 
 #functions to combine newd flow from one or multiple searches
-@st.cache(suppress_st_warning=True)
 def comboGets(search):
   searchList = [word.strip() for word in search.split("&")]
   for i, word in enumerate(searchList):
@@ -97,36 +96,52 @@ def comboGets(search):
   data = data.drop_duplicates(subset='title')
   return data
 
-#Streamlit app
-#initialization, loading of 1st load 
-data = comboGets("natural gas europe & Montel TTF prices").to_html(escape=False, index=False)
 
-#app layout
-st.title('SEGE LIVE Energy News App')
-search_input = st.text_input("Search: ",value="natural gas europe & Montel TTF prices", max_chars=200, placeholder="Insert 1 or multiple searches separated by &")
-st.markdown=(f"input is: {search_input}")
+####################STREAMLIT APP###################
+#set the full page mode
+st.set_page_config(layout="wide")
 
-status = st.empty()
-if search_input=="":
-    search_input= "empty search, please add search input"
-else:
-    data = comboGets(search_input).to_html(escape=False, index=False)
+#init session
+session = st.session_state
 
-status.text(f"searched news for: {search_input}")
-auto_update_checkbox = st.checkbox('10 min auto refresh?')
+if 'status' not in session:
+    session.status = 'State 0'
+if 'auto_refresh_count' not in session:
+    session.auto_refresh_count = 0
+if 'search' not in session:
+    session.search = "Natural Gas Europe"
+if 'news_data' not in session:
+    session.news_data = comboGets(session.search).to_html(escape=False, index=False)
 
-table = st.empty() #st.container()
-table.container().write(data, unsafe_allow_html=True)
+def f_update() :
+    with st.spinner("Refreshing page... please hold a sec"):
+        session.news_data = comboGets(session.search).to_html(escape=False, index=False)
+        session.status = "updated"
 
-while(auto_update_checkbox):
-    table.empty()
-    status.text("fetching data...")
-    data = comboGets(search_input)
-    data = data.to_html(escape=False, index=False)
-    table.write(data, unsafe_allow_html=True)
-    now = now = moment.utcnow().timezone("Europe/Brussels").format('DD MMMM HH:mm:ss')
-    status.text(f"Last refresh: {now}")
-    time.sleep(600.0)
+#App layout
+st.title('SEGE ENERGY NEWS LIVE')
+st.text_input(label='Input Searched Keyword(s)',key='search', on_change=f_update)
+
+st.write('Search entered: ',session.search)
+checkbox = st.checkbox(label='10 mins auto refresh', key='auto_update')
+
+#st.write(session)
+
+countAutoRefresh = st.empty()
+countAutoRefresh.write(f'Count of Auto Refresh: {session.auto_refresh_count}')
+
+news_table = st.empty()
+news_table.write(session.news_data, unsafe_allow_html=True)
+
+while (checkbox):
+    with st.spinner("Auto refresh..."):
+        session.news_data = comboGets(session.search).to_html(escape=False, index=False)
+    session.auto_refresh_count += 1
+    countAutoRefresh.write(f'Count of Auto Refresh: {session.auto_refresh_count}')
+    news_table.empty()
+    news_table.write(session.news_data, unsafe_allow_html=True)
+    time.sleep(600)
     
+
 
 
