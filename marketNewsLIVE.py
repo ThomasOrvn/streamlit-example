@@ -1,16 +1,11 @@
 #classics
-from multiprocessing.sharedctypes import Value
-from re import L
 import json
 import pandas as pd
 import time
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-#Translation
-from translate import Translator
+
+
 #necessary for data scraping
 from urllib.request import Request, urlopen
-from bs4 import BeautifulSoup
 #streamlit
 import streamlit as st
 
